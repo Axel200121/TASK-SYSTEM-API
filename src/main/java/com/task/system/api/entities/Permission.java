@@ -9,9 +9,8 @@ import java.util.Date;
 import java.util.List;
 
 @Entity
-@Table(name = "role")
-public class Role {
-
+@Table(name = "permission")
+public class Permission {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
@@ -23,18 +22,15 @@ public class Role {
     @Enumerated(EnumType.STRING)
     private StatusRegister status;
 
-    @ManyToMany(mappedBy = "roles")
-    private List<User> users;
-
-    @ManyToMany
-    @JoinTable(name = "role_permission", joinColumns = @JoinColumn(name = "role_id"), inverseJoinColumns = @JoinColumn(name = "permission_id"))
-    private List<Permission> permissions;
+    @ManyToMany(mappedBy = "permissions")
+    private List<Role> roles;
 
     @CreationTimestamp
     private Date createdAt;
 
     @UpdateTimestamp
     private Date updatedAt;
+
 
     public String getId() {
         return id;
@@ -68,20 +64,12 @@ public class Role {
         this.status = status;
     }
 
-    public List<User> getUsers() {
-        return users;
+    public List<Role> getRoles() {
+        return roles;
     }
 
-    public void setUsers(List<User> users) {
-        this.users = users;
-    }
-
-    public List<Permission> getPermissions() {
-        return permissions;
-    }
-
-    public void setPermissions(List<Permission> permissions) {
-        this.permissions = permissions;
+    public void setRoles(List<Role> roles) {
+        this.roles = roles;
     }
 
     public Date getCreatedAt() {

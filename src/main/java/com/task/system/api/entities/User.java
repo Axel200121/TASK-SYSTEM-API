@@ -5,12 +5,13 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 @Entity
-@Table(name = "role")
-public class Role {
+@Table(name = "users")
+public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -18,17 +19,22 @@ public class Role {
 
     private String name;
 
-    private String description;
+    private String lastName;
+
+    private String phone;
+
+    private String address;
+
+    private String email;
+
+    private String password;
 
     @Enumerated(EnumType.STRING)
     private StatusRegister status;
 
-    @ManyToMany(mappedBy = "roles")
-    private List<User> users;
-
     @ManyToMany
-    @JoinTable(name = "role_permission", joinColumns = @JoinColumn(name = "role_id"), inverseJoinColumns = @JoinColumn(name = "permission_id"))
-    private List<Permission> permissions;
+    @JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private List<Role> roles;
 
     @CreationTimestamp
     private Date createdAt;
@@ -52,36 +58,52 @@ public class Role {
         this.name = name;
     }
 
-    public String getDescription() {
-        return description;
+    public String getLastName() {
+        return lastName;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
-    public StatusRegister getStatus() {
-        return status;
+    public String getPhone() {
+        return phone;
     }
 
-    public void setStatus(StatusRegister status) {
-        this.status = status;
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
-    public List<User> getUsers() {
-        return users;
+    public String getAddress() {
+        return address;
     }
 
-    public void setUsers(List<User> users) {
-        this.users = users;
+    public void setAddress(String address) {
+        this.address = address;
     }
 
-    public List<Permission> getPermissions() {
-        return permissions;
+    public String getEmail() {
+        return email;
     }
 
-    public void setPermissions(List<Permission> permissions) {
-        this.permissions = permissions;
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public List<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<Role> roles) {
+        this.roles = roles;
     }
 
     public Date getCreatedAt() {

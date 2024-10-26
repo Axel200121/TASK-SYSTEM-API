@@ -3,16 +3,14 @@ package com.task.system.api.dtos;
 import java.util.Date;
 import java.util.List;
 
-public class RoleDTO {
+public class PermissionDTO {
     private String id;
     private String name;
     private String description;
     private String status;
-    private List<UserDTO> users;
-    private List<PermissionDTO> permissions;
+    private List<RoleDTO> roles;
     private Date createdAt;
     private Date updatedAt;
-
 
     public String getId() {
         return id;
@@ -46,20 +44,12 @@ public class RoleDTO {
         this.status = status;
     }
 
-    public List<UserDTO> getUsers() {
-        return users;
+    public List<RoleDTO> getRoles() {
+        return roles;
     }
 
-    public void setUsers(List<UserDTO> users) {
-        this.users = users;
-    }
-
-    public List<PermissionDTO> getPermissions() {
-        return permissions;
-    }
-
-    public void setPermissions(List<PermissionDTO> permissions) {
-        this.permissions = permissions;
+    public void setRoles(List<RoleDTO> roles) {
+        this.roles = roles;
     }
 
     public Date getCreatedAt() {
