@@ -1,11 +1,15 @@
 package com.task.system.api.dtos;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 import java.util.Date;
 import java.util.List;
 
 public class RoleDTO {
+    @NotBlank(message = "El identificador del rol no puede estas vacia")
+    @NotNull(message = "El identificador del rol no puede ser nulo")
     private String id;
     private String name;
     private String description;
