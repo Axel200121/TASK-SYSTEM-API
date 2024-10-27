@@ -1,5 +1,7 @@
 package com.task.system.api.dtos;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.Date;
 import java.util.List;
 
@@ -8,6 +10,7 @@ public class PermissionDTO {
     private String name;
     private String description;
     private String status;
+    @JsonIgnore
     private List<RoleDTO> roles;
     private Date createdAt;
     private Date updatedAt;
