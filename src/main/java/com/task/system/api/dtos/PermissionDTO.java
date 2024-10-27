@@ -1,18 +1,33 @@
 package com.task.system.api.dtos;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 import java.util.Date;
 import java.util.List;
 
 public class PermissionDTO {
     private String id;
+    @NotBlank(message = "El nombre no puede estar vacio")
+    @NotNull(message = "El nombre no puede ser nulo")
     private String name;
+
+    @NotBlank(message = "La descripción no puede estar vacio")
+    @NotNull(message = "La descripción no puede ser nulo")
+    @Size(max = 255, message = "La descripción no puede exceder 255 caracteres.")
     private String description;
+
+    @NotBlank(message = "El status del permiso no puede estar vacio")
+    @NotNull(message = "El status del permiso no puede estar nulo")
     private String status;
+
     @JsonIgnore
     private List<RoleDTO> roles;
+
     private Date createdAt;
+
     private Date updatedAt;
 
     public String getId() {

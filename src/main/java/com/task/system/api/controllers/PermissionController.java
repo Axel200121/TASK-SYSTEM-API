@@ -3,11 +3,13 @@ package com.task.system.api.controllers;
 import com.task.system.api.dtos.ApiResponseDTO;
 import com.task.system.api.dtos.PermissionDTO;
 import com.task.system.api.services.PermissionService;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -19,14 +21,14 @@ public class PermissionController {
     private static final Logger LOGGER = LoggerFactory.getLogger(PermissionController.class);
 
     @PostMapping("/save")
-    public ResponseEntity<ApiResponseDTO> savePermission(@RequestBody PermissionDTO permissionDTO){
-        ApiResponseDTO response = permissionService.savePermission(permissionDTO);
+    public ResponseEntity<ApiResponseDTO> savePermission(@Valid @RequestBody PermissionDTO permissionDTO, BindingResult bindingResult){
+        ApiResponseDTO response = permissionService.savePermission(permissionDTO,bindingResult);
         return new ResponseEntity<>(response, HttpStatusCode.valueOf(response.getStatusCode()));
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<ApiResponseDTO> updatePermission(@PathVariable String id, @RequestBody PermissionDTO permissionDTO){
-        ApiResponseDTO response = permissionService.updatePermission(id,permissionDTO);
+    public ResponseEntity<ApiResponseDTO> updatePermission(@PathVariable String id, @Valid @RequestBody PermissionDTO permissionDTO,BindingResult bindingResult){
+        ApiResponseDTO response = permissionService.updatePermission(id,permissionDTO,bindingResult);
         return  new ResponseEntity<>(response, HttpStatusCode.valueOf(response.getStatusCode()));
     }
 

@@ -4,6 +4,7 @@ import com.task.system.api.controllers.PermissionController;
 import com.task.system.api.dtos.ApiResponseDTO;
 import com.task.system.api.dtos.PermissionDTO;
 import com.task.system.api.dtos.UserDTO;
+import com.task.system.api.dtos.ValidateFieldDTO;
 import com.task.system.api.entities.Permission;
 import com.task.system.api.entities.User;
 import com.task.system.api.repositories.PermissionRepository;
@@ -15,6 +16,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,15 +55,22 @@ public class PermissionServiceImpl implements PermissionService {
     }
 
     @Override
-    public ApiResponseDTO savePermission(PermissionDTO permissionDTO) {
+    public ApiResponseDTO savePermission(PermissionDTO permissionDTO, BindingResult bindingResult) {
+        List<ValidateFieldDTO> validateFieldDTOList = validateInputs(bindingResult);
+        if (!validateFieldDTOList.isEmpty())
+            return new ApiResponseDTO(HttpStatus.BAD_REQUEST.value(), "Campos inválidos, verifica por favor", validateFieldDTOList);
 
         Permission permissionSave = permissionRepository.save(convertPermissionToEntity(permissionDTO));
-
         return new ApiResponseDTO(HttpStatus.CREATED.value(),"Permiso creado correctamente",convertPermissionToDTO(permissionSave));
     }
 
     @Override
-    public ApiResponseDTO updatePermission(String idPermission, PermissionDTO permissionDTO) {
+    public ApiResponseDTO updatePermission(String idPermission, PermissionDTO permissionDTO, BindingResult bindingResult) {
+
+        List<ValidateFieldDTO> validateFieldDTOList = validateInputs(bindingResult);
+        if (!validateFieldDTOList.isEmpty())
+            return new ApiResponseDTO(HttpStatus.BAD_REQUEST.value(), "Campos inválidos, verifica por favor", validateFieldDTOList);
+
         Permission permission = this.getPermissionById(idPermission);
         if (permission == null)
             return new ApiResponseDTO(HttpStatus.BAD_REQUEST.value(),"No existe el permiso que quieres actualizar",null);
@@ -92,6 +102,20 @@ public class PermissionServiceImpl implements PermissionService {
             assigmentPermissions.add(getPermission);
         }
         return assigmentPermissions;
+    }
+
+    private List<ValidateFieldDTO> validateInputs(BindingResult bindingResult){
+        List<ValidateFieldDTO> validateFieldDTOList = new ArrayList<>();
+        if (bindingResult.hasErrors()) {
+            LOGGER.info("UN CAMPO NO CUMPLE LA VALIDACIÓN");
+            bindingResult.getFieldErrors().forEach(fieldError -> {
+                ValidateFieldDTO validateFieldDTO = new ValidateFieldDTO();
+                validateFieldDTO.setFieldValidated(fieldError.getField());
+                validateFieldDTO.setFieldValidatedMessage(fieldError.getDefaultMessage());
+                validateFieldDTOList.add(validateFieldDTO); // Agregar a la lista
+            });
+        }
+        return validateFieldDTOList;
     }
 
     private Permission getPermissionById(String id){
