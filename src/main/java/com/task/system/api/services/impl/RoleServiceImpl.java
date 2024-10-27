@@ -1,12 +1,18 @@
 package com.task.system.api.services.impl;
 
+import com.task.system.api.controllers.PermissionController;
 import com.task.system.api.dtos.ApiResponseDTO;
 import com.task.system.api.dtos.RoleDTO;
+import com.task.system.api.entities.Permission;
 import com.task.system.api.entities.Role;
 import com.task.system.api.mappers.RoleMapper;
 import com.task.system.api.repositories.RoleRepository;
+import com.task.system.api.services.PermissionService;
 import com.task.system.api.services.RoleService;
+import com.task.system.api.utils.StatusRegister;
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -19,6 +25,9 @@ import java.util.stream.Collectors;
 @Service
 public class RoleServiceImpl implements RoleService {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(PermissionController.class);
+
+
     @Autowired
     private RoleRepository roleRepository;
 
@@ -28,6 +37,9 @@ public class RoleServiceImpl implements RoleService {
     @Autowired
     private ModelMapper modelMapper;
 
+    @Autowired
+    private PermissionService permissionService;
+
     @Override
     public ApiResponseDTO getAllRoles() {
         List<Role> rolesBD = roleRepository.findAll();
@@ -35,7 +47,7 @@ public class RoleServiceImpl implements RoleService {
         if(rolesBD.isEmpty())
             return new ApiResponseDTO(HttpStatus.BAD_REQUEST.value(),"No tienes roles almacenados",null);
 
-        List<RoleDTO> roleDTOList = rolesBD.stream().map(roleMapper::toDto).collect(Collectors.toList());
+        List<RoleDTO> roleDTOList = rolesBD.stream().map(this::convertRoleToDTO).collect(Collectors.toList());
         return new ApiResponseDTO(HttpStatus.OK.value(),"Lista de Roles",roleDTOList);
     }
 
@@ -46,13 +58,19 @@ public class RoleServiceImpl implements RoleService {
         if (getRole==null)
             return new ApiResponseDTO(HttpStatus.BAD_REQUEST.value(),"No existe este rol en la base de datos",null);
 
-        return new ApiResponseDTO(HttpStatus.OK.value(),"Rol encontrado", roleMapper.toDto(getRole));
+        return new ApiResponseDTO(HttpStatus.OK.value(),"Rol encontrado", convertRoleToDTO(getRole));
     }
 
 
     @Override
     public ApiResponseDTO saveRole(RoleDTO roleDTO) {
-        Role roleSave =roleRepository.save(convertRoleToEntity(roleDTO));
+        List<Permission> assigmentPermissions = permissionService.getPermissionsById(roleDTO.getPermissions());
+        if (assigmentPermissions == null || assigmentPermissions.isEmpty())
+            return new ApiResponseDTO(HttpStatus.BAD_REQUEST.value(),"No existen los permisos que quieres asignarle al Rol",null);
+
+        Role role = convertRoleToEntity(roleDTO);
+        role.setPermissions(assigmentPermissions);
+        Role roleSave =roleRepository.save(role);
         return new ApiResponseDTO(HttpStatus.CREATED.value(),"Rol creado exitosamente",convertRoleToDTO(roleSave));
     }
 
@@ -62,9 +80,16 @@ public class RoleServiceImpl implements RoleService {
         if (getRole==null)
             return new ApiResponseDTO(HttpStatus.BAD_REQUEST.value(),"No existe este rol en la base de datos",null);
 
+        List<Permission> permissionList= permissionService.getPermissionsById(roleDTO.getPermissions());
+        if (permissionList==null || permissionList.isEmpty())
+            return new ApiResponseDTO(HttpStatus.BAD_REQUEST.value(),"Los permisos a asignar no existen o estan desactivados, verifica por favor",null);
+
         getRole.setName(roleDTO.getName());
-        Role roleSave = roleRepository.save(roleMapper.toEntity(roleDTO));
-        return new ApiResponseDTO(HttpStatus.OK.value(),"Rol actualizado correctamente", roleMapper.toDto(roleSave));
+        getRole.setDescription(roleDTO.getDescription());
+        getRole.setStatus(StatusRegister.valueOf(roleDTO.getStatus()));
+        getRole.setPermissions(permissionList);
+        Role roleSave = roleRepository.save(getRole);
+        return new ApiResponseDTO(HttpStatus.OK.value(),"Rol actualizado correctamente", convertRoleToDTO(roleSave));
     }
 
     @Override
@@ -80,11 +105,8 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public List<Role> getRolesById(List<RoleDTO> rolesDto) {
-        if (rolesDto.isEmpty())
-            return null;
-
+        if (rolesDto.isEmpty()) return null;
         List<Role> assigmentRoleUser = new ArrayList<>();
-
         for (RoleDTO searchRole : rolesDto) {
             Role getRole = getRoleById(searchRole.getId());
             assigmentRoleUser.add(getRole);
