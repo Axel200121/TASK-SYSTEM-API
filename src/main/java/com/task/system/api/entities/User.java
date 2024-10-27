@@ -121,4 +121,12 @@ public class User {
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
     }
+
+    public StatusRegister getStatus() {
+        return status;
+    }
+
+    public void setStatus(StatusRegister status) {
+        this.status = status;
+    }
 }

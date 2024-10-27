@@ -6,10 +6,12 @@ import com.task.system.api.entities.Role;
 import com.task.system.api.mappers.RoleMapper;
 import com.task.system.api.repositories.RoleRepository;
 import com.task.system.api.services.RoleService;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -22,6 +24,9 @@ public class RoleServiceImpl implements RoleService {
 
     @Autowired
     private RoleMapper roleMapper;
+
+    @Autowired
+    private ModelMapper modelMapper;
 
     @Override
     public ApiResponseDTO getAllRoles() {
@@ -47,8 +52,8 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public ApiResponseDTO saveRole(RoleDTO roleDTO) {
-        Role roleSave =roleRepository.save(roleMapper.toEntity(roleDTO));
-        return new ApiResponseDTO(HttpStatus.CREATED.value(),"Rol creado exitosamente",roleMapper.toDto(roleSave));
+        Role roleSave =roleRepository.save(convertRoleToEntity(roleDTO));
+        return new ApiResponseDTO(HttpStatus.CREATED.value(),"Rol creado exitosamente",convertRoleToDTO(roleSave));
     }
 
     @Override
@@ -73,8 +78,30 @@ public class RoleServiceImpl implements RoleService {
         return new ApiResponseDTO(HttpStatus.OK.value(),"Rol eliminado correctamente",null);
     }
 
-    private Role getRoleById(String id){
-        Optional<Role> roleBd = roleRepository.findById(id);
+    @Override
+    public List<Role> getRolesById(List<RoleDTO> rolesDto) {
+        if (rolesDto.isEmpty())
+            return null;
+
+        List<Role> assigmentRoleUser = new ArrayList<>();
+
+        for (RoleDTO searchRole : rolesDto) {
+            Role getRole = getRoleById(searchRole.getId());
+            assigmentRoleUser.add(getRole);
+        }
+        return assigmentRoleUser;
+    }
+
+    private Role getRoleById(String idRole){
+        Optional<Role> roleBd = roleRepository.findById(idRole);
         return roleBd.orElse(null);
+    }
+
+    public RoleDTO convertRoleToDTO(Role role) {
+        return modelMapper.map(role, RoleDTO.class);
+    }
+
+    public Role convertRoleToEntity(RoleDTO roleDTO) {
+        return modelMapper.map(roleDTO, Role.class);
     }
 }
