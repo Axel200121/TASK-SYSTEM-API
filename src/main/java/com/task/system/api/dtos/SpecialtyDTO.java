@@ -1,28 +1,23 @@
 package com.task.system.api.dtos;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 import java.util.Date;
-import java.util.List;
 
-public class RoleDTO {
+public class SpecialtyDTO {
+
     private String id;
-    @NotNull(message = "El nombre no puede ser nulo")
-    @NotBlank(message = "El nombe no puede estar vacio")
+
+    @NotBlank(message = "El nombre de la especialidad no puede estar vacio")
+    @NotNull(message = "El nombre de la especialidad no puede estar nulo")
     private String name;
 
-    @NotNull(message = "La descripción no puede ser nulo")
     @NotBlank(message = "La descripción no puede estar vacio")
+    @NotNull(message = "La descripción no puede estar nulo")
     private String description;
 
-    @NotNull(message = "El status no puede ser nulo")
-    @NotBlank(message = "El status no puede estar vacio")
-    private String status;
-    @JsonIgnore
-    private List<UserDTO> users;
-    private List<PermissionDTO> permissions;
     private Date createdAt;
     private Date updatedAt;
 
@@ -49,30 +44,6 @@ public class RoleDTO {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public List<UserDTO> getUsers() {
-        return users;
-    }
-
-    public void setUsers(List<UserDTO> users) {
-        this.users = users;
-    }
-
-    public List<PermissionDTO> getPermissions() {
-        return permissions;
-    }
-
-    public void setPermissions(List<PermissionDTO> permissions) {
-        this.permissions = permissions;
     }
 
     public Date getCreatedAt() {

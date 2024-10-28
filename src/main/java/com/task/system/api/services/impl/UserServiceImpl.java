@@ -6,11 +6,13 @@ import com.task.system.api.dtos.LoginDTO;
 import com.task.system.api.dtos.UserDTO;
 import com.task.system.api.dtos.ValidateFieldDTO;
 import com.task.system.api.entities.Role;
+import com.task.system.api.entities.Specialty;
 import com.task.system.api.entities.User;
 import com.task.system.api.mappers.UserMapper;
 import com.task.system.api.repositories.RoleRepository;
 import com.task.system.api.repositories.UserRepository;
 import com.task.system.api.services.RoleService;
+import com.task.system.api.services.SpecialtyService;
 import com.task.system.api.services.UserService;
 import com.task.system.api.utils.StatusRegister;
 import org.modelmapper.ModelMapper;
@@ -36,6 +38,9 @@ public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
     @Autowired
     private RoleService roleService;
+
+    @Autowired
+    private SpecialtyService specialtyService;
 
     @Autowired
     private ModelMapper modelMapper;
@@ -73,8 +78,13 @@ public class UserServiceImpl implements UserService {
         if (assigmentRoles.isEmpty())
             return new ApiResponseDTO(HttpStatus.BAD_REQUEST.value(),"No se encontraron los roles que asignaste al usuario",null);
 
+        Specialty specialty = specialtyService.getSpecialtyById(userDTO.getSpecialty().getId());
+        if (specialty==null)
+            return new ApiResponseDTO(HttpStatus.BAD_REQUEST.value(),"No existe la especialidad a la cual le quieres asignar",null);
+
         User user = convertUserToEntity(userDTO);
         user.setRoles(assigmentRoles);
+        user.setSpecialty(specialty);
         User userSave = userRepository.save(user);
 
         return new ApiResponseDTO(HttpStatus.CREATED.value(),"Usuario registrado de manera exitosa",convertUserToDTO(userSave));
@@ -94,6 +104,10 @@ public class UserServiceImpl implements UserService {
         if (assigmentRoles.isEmpty())
             return new ApiResponseDTO(HttpStatus.BAD_REQUEST.value(),"No se encontraron los roles que asignaste al usuario",null);
 
+        Specialty specialty = specialtyService.getSpecialtyById(userDTO.getSpecialty().getId());
+        if (specialty==null)
+            return new ApiResponseDTO(HttpStatus.BAD_REQUEST.value(),"No existe la especialidad a la cual le quieres asignar",null);
+
         userBd.setName(userDTO.getName());
         userBd.setLastName(userDTO.getLastName());
         userBd.setPhone(userDTO.getPhone());
@@ -102,6 +116,7 @@ public class UserServiceImpl implements UserService {
         userBd.setPassword(userDTO.getPassword());
         userBd.setStatus(StatusRegister.valueOf(userDTO.getStatus()));
         userBd.setRoles(assigmentRoles);
+        userBd.setSpecialty(specialty);
 
         User userUpdate = userRepository.save(userBd);
         return new ApiResponseDTO(HttpStatus.OK.value(),"Usuario actualizado correctamente", convertUserToDTO(userUpdate));

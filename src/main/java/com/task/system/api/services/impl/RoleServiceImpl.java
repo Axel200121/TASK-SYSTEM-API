@@ -3,6 +3,7 @@ package com.task.system.api.services.impl;
 import com.task.system.api.controllers.PermissionController;
 import com.task.system.api.dtos.ApiResponseDTO;
 import com.task.system.api.dtos.RoleDTO;
+import com.task.system.api.dtos.ValidateFieldDTO;
 import com.task.system.api.entities.Permission;
 import com.task.system.api.entities.Role;
 import com.task.system.api.mappers.RoleMapper;
@@ -16,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.BindingResult;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,7 +65,12 @@ public class RoleServiceImpl implements RoleService {
 
 
     @Override
-    public ApiResponseDTO saveRole(RoleDTO roleDTO) {
+    public ApiResponseDTO saveRole(RoleDTO roleDTO, BindingResult bindingResult) {
+
+        List<ValidateFieldDTO> validateFieldDTOList = validateInputs(bindingResult);
+        if (!validateFieldDTOList.isEmpty())
+            return new ApiResponseDTO(HttpStatus.BAD_REQUEST.value(), "Campos inválidos, verifica por favor", validateFieldDTOList);
+
         List<Permission> assigmentPermissions = permissionService.getPermissionsById(roleDTO.getPermissions());
         if (assigmentPermissions == null || assigmentPermissions.isEmpty())
             return new ApiResponseDTO(HttpStatus.BAD_REQUEST.value(),"No existen los permisos que quieres asignarle al Rol",null);
@@ -75,7 +82,12 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public ApiResponseDTO updateRole(String idRole, RoleDTO roleDTO) {
+    public ApiResponseDTO updateRole(String idRole, RoleDTO roleDTO,BindingResult bindingResult) {
+
+        List<ValidateFieldDTO> validateFieldDTOList = validateInputs(bindingResult);
+        if (!validateFieldDTOList.isEmpty())
+            return new ApiResponseDTO(HttpStatus.BAD_REQUEST.value(), "Campos inválidos, verifica por favor", validateFieldDTOList);
+
         Role getRole = getRoleById(idRole);
         if (getRole==null)
             return new ApiResponseDTO(HttpStatus.BAD_REQUEST.value(),"No existe este rol en la base de datos",null);
@@ -117,6 +129,20 @@ public class RoleServiceImpl implements RoleService {
     private Role getRoleById(String idRole){
         Optional<Role> roleBd = roleRepository.findById(idRole);
         return roleBd.orElse(null);
+    }
+
+    private List<ValidateFieldDTO> validateInputs(BindingResult bindingResult){
+        List<ValidateFieldDTO> validateFieldDTOList = new ArrayList<>();
+        if (bindingResult.hasErrors()) {
+            LOGGER.info("UN CAMPO NO CUMPLE LA VALIDACIÓN");
+            bindingResult.getFieldErrors().forEach(fieldError -> {
+                ValidateFieldDTO validateFieldDTO = new ValidateFieldDTO();
+                validateFieldDTO.setFieldValidated(fieldError.getField());
+                validateFieldDTO.setFieldValidatedMessage(fieldError.getDefaultMessage());
+                validateFieldDTOList.add(validateFieldDTO); // Agregar a la lista
+            });
+        }
+        return validateFieldDTOList;
     }
 
     public RoleDTO convertRoleToDTO(Role role) {

@@ -3,9 +3,11 @@ package com.task.system.api.controllers;
 import com.task.system.api.dtos.ApiResponseDTO;
 import com.task.system.api.dtos.RoleDTO;
 import com.task.system.api.services.RoleService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -16,8 +18,8 @@ public class RoleController {
     private RoleService roleService;
 
     @PostMapping("/save")
-    public ResponseEntity<ApiResponseDTO> roleSave(@RequestBody RoleDTO roleDTO){
-        ApiResponseDTO response = roleService.saveRole(roleDTO);
+    public ResponseEntity<ApiResponseDTO> roleSave(@Valid @RequestBody RoleDTO roleDTO, BindingResult bindingResult){
+        ApiResponseDTO response = roleService.saveRole(roleDTO,bindingResult);
         return new ResponseEntity<>(response, HttpStatusCode.valueOf(response.getStatusCode()));
     }
 
@@ -34,8 +36,8 @@ public class RoleController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<ApiResponseDTO> roleUpdate(@PathVariable String id, @RequestBody RoleDTO roleDTO){
-        ApiResponseDTO response = roleService.updateRole(id, roleDTO);
+    public ResponseEntity<ApiResponseDTO> roleUpdate(@PathVariable String id, @Valid @RequestBody RoleDTO roleDTO,BindingResult bindingResult){
+        ApiResponseDTO response = roleService.updateRole(id, roleDTO,bindingResult);
         return new ResponseEntity<>(response,HttpStatusCode.valueOf(response.getStatusCode()));
     }
 

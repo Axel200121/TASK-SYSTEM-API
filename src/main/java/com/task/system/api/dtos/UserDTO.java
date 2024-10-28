@@ -51,6 +51,9 @@ public class UserDTO {
     @Size(min = 1, message = "Debes asignar por lo menos un rol al usuario")
     private List<RoleDTO> roles;
 
+    @NotNull(message = "La especialidad no puede estar nulo")
+    private SpecialtyDTO specialty;
+
     private Date createdAt;
     private Date updatedAt;
 
@@ -149,5 +152,13 @@ public class UserDTO {
 
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public SpecialtyDTO getSpecialty() {
+        return specialty;
+    }
+
+    public void setSpecialty(SpecialtyDTO specialty) {
+        this.specialty = specialty;
     }
 }
