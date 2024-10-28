@@ -1,18 +1,14 @@
 package com.task.system.api.entities;
 
-import com.task.system.api.utils.StatusRegister;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 @Entity
-@Table(name = "users")
-public class User {
-
+public class Client {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
@@ -23,25 +19,12 @@ public class User {
 
     private String phone;
 
-    private String address;
-
     private String email;
 
-    private String password;
+    private String address;
 
-    @Enumerated(EnumType.STRING)
-    private StatusRegister status;
-
-    @ManyToMany
-    @JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
-    private List<Role> roles;
-
-    @ManyToOne
-    @JoinColumn(name = "specialty_id")
-    private Specialty specialty;
-
-    @OneToMany(mappedBy = "user")
-    private List<Appointment> appointments;
+    @OneToMany(mappedBy = "client")
+    private List<Patient> patients;
 
     @CreationTimestamp
     private Date createdAt;
@@ -81,14 +64,6 @@ public class User {
         this.phone = phone;
     }
 
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
     public String getEmail() {
         return email;
     }
@@ -97,20 +72,20 @@ public class User {
         this.email = email;
     }
 
-    public String getPassword() {
-        return password;
+    public String getAddress() {
+        return address;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setAddress(String address) {
+        this.address = address;
     }
 
-    public List<Role> getRoles() {
-        return roles;
+    public List<Patient> getPatients() {
+        return patients;
     }
 
-    public void setRoles(List<Role> roles) {
-        this.roles = roles;
+    public void setPatients(List<Patient> patients) {
+        this.patients = patients;
     }
 
     public Date getCreatedAt() {
@@ -127,21 +102,5 @@ public class User {
 
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
-    }
-
-    public StatusRegister getStatus() {
-        return status;
-    }
-
-    public void setStatus(StatusRegister status) {
-        this.status = status;
-    }
-
-    public Specialty getSpecialty() {
-        return specialty;
-    }
-
-    public void setSpecialty(Specialty specialty) {
-        this.specialty = specialty;
     }
 }
